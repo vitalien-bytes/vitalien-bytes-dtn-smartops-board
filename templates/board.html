@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ board.title }}</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+<header>
+  <h1>{{ board.title }}</h1>
+  <nav>
+    <form id="new-col" method="post" action="/api/column">
+      <input type="hidden" name="board_id" value="{{ board.id }}" />
+      <input name="title" placeholder="Nouvelle colonne…" />
+      <button>Ajouter</button>
+    </form>
+    <a href="/logout">Déconnexion</a>
+  </nav>
+</header>
+
+<main id="board" class="board">
+  {% for col in board.columns %}
+  <section class="column" data-col="{{ col.id }}">
+    <h2>{{ col.title }}</h2>
+    <div class="cards" ondragover="event.preventDefault();" ondrop="dropCard(event, {{ col.id }})">
+      {% for card in col.cards %}
+      <article class="card" draggable="true" ondragstart="dragCard(event, {{ card.id }})">
+        <strong>{{ card.title }}</strong>
+      </article>
+      {% endfor %}
+    </div>
+    <form class="new-card" method="post" action="/api/card">
+      <input type="hidden" name="column_id" value="{{ col.id }}" />
+      <input name="title" placeholder="Ajouter une carte…" />
+    </form>
+  </section>
+  {% endfor %}
+</main>
+
+<script>
+  // Ajout colonne
+  document.getElementById("new-col").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const r = await fetch("/api/column", { method: "POST", body: fd });
+    if (r.ok) location.reload();
+  });
+
+  // Ajout carte
+  document.querySelectorAll("form.new-card").forEach(f => {
+    f.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const r = await fetch("/api/card", { method: "POST", body: fd });
+      if (r.ok) location.reload();
+    });
+  });
+
+  // Drag & Drop
+  let draggedCardId = null;
+  function dragCard(ev, id) { draggedCardId = id; }
+  async function dropCard(ev, toColId) {
+    ev.preventDefault();
+    const target = ev.currentTarget;
+    const toPosition = target.querySelectorAll(".card").length;
+    const fd = new FormData();
+    fd.append("card_id", draggedCardId);
+    fd.append("to_column", toColId);
+    fd.append("to_position", toPosition);
+    const r = await fetch("/api/card/move", { method: "POST", body: fd });
+    if (r.ok) location.reload();
+  }
+</script>
+</body>
+</html>
