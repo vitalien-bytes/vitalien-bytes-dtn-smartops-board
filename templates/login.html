@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Connexion • DTN SmartOps</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body class="center">
+  <form class="card" method="post" action="/login">
+    <h1>DTN SmartOps</h1>
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    <label>Utilisateur</label>
+    <input name="username" required />
+    <label>Mot de passe</label>
+    <input name="password" type="password" required />
+    <button type="submit">Se connecter</button>
+  </form>
+</body>
+</html>
