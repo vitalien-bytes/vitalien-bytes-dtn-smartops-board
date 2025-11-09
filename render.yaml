@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: dtn-smartops-board
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port 10000"
+    envVars:
+      - key: PORT
+        value: "10000"
+      # À remplir dans le dashboard Render (Settings > Environment)
+      - key: DATABASE_URL
+        sync: false
+      - key: ADMIN_USER
+        sync: false
+      - key: ADMIN_PASS
+        sync: false
+      - key: BOARD_TITLE
+        value: "DTN – SmartOps"
